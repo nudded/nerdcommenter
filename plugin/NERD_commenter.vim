@@ -1088,7 +1088,13 @@ function! NERDComment(isVisual, type) range
         if s:IsInSexyComment(firstLine) || s:IsCommentedFromStartOfLine(s:Left(), theLine) || s:IsCommentedFromStartOfLine(s:Left({'alt': 1}), theLine)
             call s:UncommentLines(firstLine, lastLine)
         else
-            call s:CommentLinesToggle(forceNested, firstLine, lastLine)
+            try
+                call s:CommentLinesSexy(firstLine, lastLine)
+            catch /NERDCommenter.Delimiters/
+                call s:CommentLines(forceNested, "none", firstLine, lastLine)
+            catch /NERDCommenter.Nesting/
+                call s:NerdEcho("Sexy comment aborted. Nested sexy cannot be nested", 0)
+            endtry
         endif
 
     elseif a:type == 'minimal'
